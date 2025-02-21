@@ -1,0 +1,69 @@
+main: 
+  exp_name: test.full_sft
+  pretrain_model: Qwen2.5-3B-Instruct 
+  template: qwen # 很重要，决定了tokenizer的一些特殊处理是否正确，比如不同模型对于user/assistant的token设置就不一样，chat模型一定要用对应的template，base模型可以用vanilla
+  use_wandb: false
+  save_dir: models/output
+  pretrain_model_dir: models/base
+
+# accelerate的配置，这里改动比较频繁的是distributed type，默认的MULTI_GPU模式就是torch的DDP，在显存不够的时候需要改成DEEPSPEED模式。deepspeed_config里可以设置不同的zero_stage，stage越大显存优化越多，但同时训练所需时间也越长
+accelerate_config:
+  debug: true
+  compute_environment: LOCAL_MACHINE
+  rdzv_backend: static
+  same_network: true
+  gpu_ids: all
+  mixed_precision: bf16
+  distributed_type: DEEPSPEED  # DEEPSPEED MULTI_GPU 
+  deepspeed_config:
+    zero_stage: 1
+    zero3_init_flag: false
+    offload_optimizer_device: none
+    offload_param_device: none
+
+# 模型训练时候的配置，具体的参数需要阅读代码，改动频率比较高的是finetuning_type（lora\full等）和lora_target，还有一些超参数
+model_config:
+  stage: sft
+  do_train: true
+  overwrite_output_dir: true
+
+  output_dir: ${main.save_dir}/${main.exp_name}
+  model_name_or_path: ${main.pretrain_model_dir}/${main.pretrain_model}
+  #model_name_or_path: /mnt/bn/lifellm/llm_exps/zhouboyan/cp.exp009-1.full_sft.yi_chat6b.product550w.chat300w.lr1e-5/
+
+  template: ${main.template}
+  finetuning_type: full
+
+  dataset:  identity,alpaca_zh_demo
+  dataset_dir: data
+  cutoff_len: 2048
+  val_size: 0.01
+  sft_packing: false
+
+  logging_steps: 100
+  save_steps: 1000
+  eval_steps: 1000
+  plot_loss: true
+
+  lr_scheduler_type: cosine_with_min_lr
+  learning_rate: 1.0e-5
+  warmup_ratio: 0.05
+  lr_scheduler_kwargs:
+    min_lr_rate: 0.1
+  num_train_epochs: 2
+  per_device_train_batch_size: 4
+  per_device_eval_batch_size: 1
+  gradient_accumulation_steps: 2
+  preprocessing_num_workers: 16
+
+  evaluation_strategy: steps
+  ddp_find_unused_parameters: false
+  load_best_model_at_end: false
+  bf16: false
+  log_on_each_node: false
+
+  # use_wandb: ${main.use_wandb}
+  # wandb_project: zerollm # wandb的项目
+  # wandb_entity: zeromml
+  # wandb_name: ${main.exp_name}
+  # report_to: none # 必须要加，不然会用transformer默认的wandbcallback
