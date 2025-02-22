@@ -1,9 +1,17 @@
+### 常见问题处理
+- RuntimeError: Failed to import trl.trainer.dpo_trainer because of the following error (look up to see its traceback):
+No module named 'torch._six'
+    - 解决方法： pip3 install --upgrade deepspeed
+
+- File "/home/tiger/.local/lib/python3.9/site-packages/httpx/_urlparse.py", line 411, in normalize_port
+    raise InvalidURL(f"Invalid port: {port!r}")
+httpx.InvalidURL: Invalid port: ':'
+    - 解决方法：pip3 uninstall gradio
 
 # ModelScope 模型下载指南
 一些前置的指令
 1. export http_proxy=http://sys-proxy-rd-relay.byted.org:8118  https_proxy=http://sys-proxy-rd-relay.byted.org:8118  no_proxy=code.byted.org
-2. sudo apt-get install git-lfs
-3. git lfs install
+2. pip3 install modelscope
 
 ## 1. 模型下载存放地址
 无论是使用命令行还是ModelScope SDK，默认模型会下载到`~/.cache/modelscope/hub`目录下。如果需要修改cache目录，可以手动指定环境变量`MODELSCOPE_CACHE`，指定后，模型将下载到该环境变量指定的目录中。
