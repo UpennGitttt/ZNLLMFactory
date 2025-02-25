@@ -73,6 +73,7 @@ class VllmEngine(BaseEngine):
             "dtype": model_args.infer_dtype,
             "max_model_len": model_args.vllm_maxlen,
             "tensor_parallel_size": get_device_count() or 1,
+            # "tensor_parallel_size": 1,
             "gpu_memory_utilization": model_args.vllm_gpu_util,
             "disable_log_stats": True,
             "disable_log_requests": True,

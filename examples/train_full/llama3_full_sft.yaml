@@ -2,7 +2,7 @@
 # save_dir: models/output
 # pretrain_model_dir: models/base
 # pretrain_model: Qwen2.5-3B-Instruct
-model_name_or_path: models/base/Qwen2.5-1.5B-Instruct
+model_name_or_path: models/base/DeepSeek-R1-Distill-Qwen-1.5B
 trust_remote_code: true
 
 ### method
@@ -12,15 +12,15 @@ finetuning_type: full
 deepspeed: examples/deepspeed/ds_z3_config.json  # choices: [ds_z0_config.json, ds_z2_config.json, ds_z3_config.json]
 
 ### dataset
-dataset: alpaca_en_demo
-template: qwen
+dataset: identity,alpaca_zh_demo
+template: deepseek
 cutoff_len: 2048
 max_samples: 1000
 overwrite_cache: true
 preprocessing_num_workers: 16
 
 ### output
-output_dir: models/output/trained_model
+output_dir: models/output/trained_model2
 logging_steps: 10
 save_steps: 500
 plot_loss: true
@@ -30,10 +30,12 @@ overwrite_output_dir: true
 per_device_train_batch_size: 2
 gradient_accumulation_steps: 2
 learning_rate: 4.5e-5
-num_train_epochs: 1.0
+num_train_epochs: 2.0
+neftune_noise_alpha: 5
 lr_scheduler_type: cosine
+# lr_layer_decay_ratio: 0.85
 warmup_ratio: 0.1
-bf16: false
+bf16: true
 ddp_timeout: 180000000
 
 ### eval
