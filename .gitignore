@@ -177,5 +177,7 @@ wandb/
 swanlog/
 generated_predictions.jsonl
 models/output/*
+!models/output/.gitkeep
 models/base/*
+!models/base/.gitkeep
 
